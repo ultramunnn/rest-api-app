@@ -79,6 +79,17 @@ npm run test:e2e
 npm run test:cov
 ```
 
+## API Documentation (Swagger UI)
+
+Setelah aplikasi berjalan, buka:
+
+- Swagger UI: `http://localhost:3000/docs`
+- Base API: `http://localhost:3000/api`
+
+Untuk endpoint yang protected, klik tombol **Authorize** di Swagger UI lalu isi:
+
+`<accessToken>` (tanpa prefix `Bearer`, Swagger UI akan menambahkan otomatis)
+
 ## Deployment
 
 Saat akan deploy ke production, ikuti dokumentasi deployment NestJS: https://docs.nestjs.com/deployment

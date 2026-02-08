@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
 
@@ -10,10 +10,24 @@ export class UsersService {
   ) {}
 
   async create(data: { email: string; password: string }) {
-    const user = new this.userModel();
-    user.email = data.email;
-    user.password = data.password;
-    return user.save();
+    const existing = await this.userModel.findOne({
+      where: { email: data.email },
+    });
+    if (existing) {
+      throw new ConflictException('Email already registered');
+    }
+
+    try {
+      return await this.userModel.create({
+        email: data.email,
+        password: data.password,
+      });
+    } catch (err: any) {
+      if (err?.name === 'SequelizeUniqueConstraintError') {
+        throw new ConflictException('Email already registered');
+      }
+      throw err;
+    }
   }
 
   async findAll() {

@@ -15,7 +15,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guards';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(
@@ -23,6 +25,7 @@ export class UsersController {
     private readonly postsService: PostsService,
   ) {}
 
+  @ApiOperation({ summary: 'Create user' })
   @Post()
   async create(@Body() dto: CreateUserDto) {
     const hashed = await bcrypt.hash(dto.password, 10);
@@ -33,24 +36,32 @@ export class UsersController {
     return this.sanitize(user);
   }
 
+  @ApiOperation({ summary: 'Get all users (protected)' })
+  @ApiBearerAuth()
   @Get()
   @UseGuards(JwtAuthGuard)
   async findAll() {
     return this.usersService.findAll();
   }
 
+  @ApiOperation({ summary: 'Get posts by user id (protected)' })
+  @ApiBearerAuth()
   @Get(':id/posts')
   @UseGuards(JwtAuthGuard)
   async getPostsByUser(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.findByUserId(id);
   }
 
+  @ApiOperation({ summary: 'Get user by id (protected)' })
+  @ApiBearerAuth()
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);
   }
 
+  @ApiOperation({ summary: 'Update user (protected)' })
+  @ApiBearerAuth()
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   async update(
@@ -65,6 +76,8 @@ export class UsersController {
     return user ? this.sanitize(user) : null;
   }
 
+  @ApiOperation({ summary: 'Delete user (protected)' })
+  @ApiBearerAuth()
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async remove(@Param('id', ParseIntPipe) id: number) {

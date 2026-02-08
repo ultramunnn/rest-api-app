@@ -1,11 +1,24 @@
-import { Table, Column, Model, DataType, HasMany, AllowNull } from 'sequelize-typescript';
+import type { Optional } from 'sequelize';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
 import { Post } from 'src/posts/models/post.model';
+
+export interface UserAttributes {
+  id: number;
+  email: string;
+  password: string;
+  refreshToken?: string | null;
+}
+
+export type UserCreationAttributes = Optional<
+  UserAttributes,
+  'id' | 'refreshToken'
+>;
 
 @Table({
   tableName: 'users',
   timestamps: true,
 })
-export class User extends Model<User> {
+export class User extends Model<UserAttributes, UserCreationAttributes> {
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -30,7 +43,7 @@ export class User extends Model<User> {
     type: DataType.STRING,
     allowNull: true
   })
-  declare refreshToken?: string;
+  declare refreshToken?: string | null;
 
   @HasMany(() => Post)
   declare posts: Post[];
